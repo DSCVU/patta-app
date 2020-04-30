@@ -32,7 +32,7 @@ public class LoginActivity extends AppCompatActivity implements LoginListener, L
         binding.createAccount.setOnClickListener(v ->
                 startActivity(new Intent(LoginActivity.this, SignupActivity.class)));
         binding.forgotPassword.setOnClickListener(v ->
-                startActivity(new Intent(LoginActivity.this, SignupActivity.class)));
+                startActivity(new Intent(LoginActivity.this, ForgotPasswordActivity.class)));
     }
 
     @Override
