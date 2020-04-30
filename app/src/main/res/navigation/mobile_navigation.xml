@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_generate">
+
+    <fragment
+        android:id="@+id/navigation_generate"
+        android:name="pk.patta.app.fragments.QRGeneratorFragment"
+        android:label="@string/title_qrgenerate"
+        tools:layout="@layout/fragment_qrgenerator" />
+
+    <fragment
+        android:id="@+id/navigation_scan"
+        android:name="pk.patta.app.fragments.QRScannerFragment"
+        android:label="@string/title_qrscan"
+        tools:layout="@layout/fragment_qrscanner" />
+
+</navigation>

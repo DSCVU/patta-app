@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <data>
+        <variable
+            name="viewModel"
+            type="pk.patta.app.viewmodels.QRScannerViewModel" />
+    </data>
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".fragments.QRScannerFragment">
+
+        <!-- ScannerView -->
+        <de.klimek.scanner.ScannerView
+            android:id="@+id/scannerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:allow_frontcamera="false"
+            app:decode_interval="500"
+            app:reticle_color="@color/transparent_color"
+            app:reticle_fraction="0.5"
+            app:use_flash="false"/>
+
+        <TextView
+            android:id="@+id/ssInfoTxt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="16dp"
+            android:text="Align QR Code/ Barcode within the Frame to Scan"
+            android:textAlignment="center"
+            android:textColor="#fff"
+            android:textSize="12sp"
+            tools:ignore="HardcodedText"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:orientation="horizontal"
+            android:layout_above="@+id/ssInfoTxt">
+
+            <ImageView
+                android:id="@+id/gallery"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="8dp"
+                android:contentDescription="@string/open_gallery"
+                android:tint="@color/colorPrimaryDark"
+                app:srcCompat="@drawable/ic_image_black_24dp" />
+
+            <ImageView
+                android:id="@+id/flash"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginBottom="8dp"
+                android:contentDescription="@string/turn_flash_on"
+                android:tint="@color/colorPrimaryDark"
+                app:srcCompat="@drawable/ic_flash_on_black_24dp"
+                />
+        </LinearLayout>
+    </RelativeLayout>
+</layout>

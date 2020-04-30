@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">Patta</string>
+    <string name="patta_app_logo">Patta App Logo</string>
+    <string name="name">Name</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="address">Address</string>
+    <string name="signup">Signup</string>
+    <string name="union_council_number">Union Council Number</string>
+    <string name="ten_digit_code_gen">00000-00000</string>
+    <string name="login">Login</string>
+    <string name="signup_text_link">Don\'t have an account? Create One</string>
+    <string name="title_activity_dashboard">DashboardActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_qrgenerate">QR Generate</string>
+    <string name="title_qrscan">QR Scan</string>
+    <string name="open_gallery">Open Gallery</string>
+    <string name="turn_flash_on">Turn Flash On</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="signout">Signout</string>
+    <string name="forgot_password_click_here">Forgot Password? Click Here</string>
+    <string name="recover_password">Recover Password</string>
+</resources>

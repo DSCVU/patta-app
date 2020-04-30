@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "496966458380",
+    "firebase_url": "https://fleet-flame-271817.firebaseio.com",
+    "project_id": "fleet-flame-271817",
+    "storage_bucket": "fleet-flame-271817.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:496966458380:android:465493368765497f3ee229",
+        "android_client_info": {
+          "package_name": "pk.patta.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "496966458380-cjvjmme209gunj782j862ncbkeq2mnnr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDNPNhY9bygofSP1m40Ec5enhjBpYYzqL0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "496966458380-cjvjmme209gunj782j862ncbkeq2mnnr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
