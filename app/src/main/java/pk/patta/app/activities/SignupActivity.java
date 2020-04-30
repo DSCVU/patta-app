@@ -6,6 +6,9 @@ import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.work.Data;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,11 +17,13 @@ import android.widget.ArrayAdapter;
 
 import com.facebook.stetho.Stetho;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseAuth;
 import com.tiper.MaterialSpinner;
 //import com.jaredrummler.materialspinner.MaterialSpinner;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import pk.patta.app.R;
 import pk.patta.app.databinding.ActivitySignupBinding;
@@ -27,6 +32,7 @@ import pk.patta.app.models.District;
 import pk.patta.app.models.Division;
 import pk.patta.app.models.Province;
 import pk.patta.app.viewmodels.SignupViewModel;
+import pk.patta.app.worker.SaveDataToFirestore;
 
 public class SignupActivity extends AppCompatActivity implements SignupListener, LifecycleOwner {
 
@@ -54,7 +60,8 @@ public class SignupActivity extends AppCompatActivity implements SignupListener,
         populateProvinceSpinner();
         binding.signupButton.setOnClickListener(v -> {
             if (isValid()){
-                viewModel.signup(binding.email.getText().toString().trim(),
+                viewModel.signup(
+                        binding.email.getText().toString().trim(),
                         binding.password.getText().toString().trim());
             }
         });
@@ -200,6 +207,18 @@ public class SignupActivity extends AppCompatActivity implements SignupListener,
     public void onSignupSuccess() {
         binding.progressBar.setVisibility(View.INVISIBLE);
         binding.signupButton.setEnabled(true);
+        Data data = new Data.Builder()
+                .putString("name", binding.name.getText().toString().trim())
+                .putString("address", binding.address.getText().toString().trim())
+                .putString("province", binding.province.getSelectedItem().toString())
+                .putString("division", binding.division.getSelectedItem().toString())
+                .putString("district", binding.district.getSelectedItem().toString())
+                .putString("union_council", binding.unionCouncil.getText().toString().trim())
+                .build();
+        OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(SaveDataToFirestore.class)
+                .setInputData(data)
+                .build();
+        WorkManager.getInstance(getApplicationContext()).enqueue(request);
         startActivity(new Intent(SignupActivity.this, DashboardActivity.class));
     }
 

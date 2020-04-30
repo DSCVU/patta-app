@@ -25,6 +25,8 @@ public class ForgotPasswordActivity extends AppCompatActivity implements ForgotP
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_forgot_password);
         viewModel = new ViewModelProvider(this).get(ForgotPasswordViewModel.class);
+        viewModel.listener = this;
+        binding.materialButton.setOnClickListener(v -> viewModel.forgotPassword(binding.password.getText().toString().trim()));
     }
 
     @Override
