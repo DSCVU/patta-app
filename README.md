@@ -6,6 +6,7 @@ Patta Android App is an Android App for Patta App Project assigned by DSC VU. Ba
 
 - Android Studio
 - Java
+- Firebase
 
 ## Installation
 
@@ -17,15 +18,15 @@ Patta Android App is an Android App for Patta App Project assigned by DSC VU. Ba
 
 |Directory       |Purpose                          
 |----------------|-------------------------------
-|activities      |It contains all activities with only UI code            
+|activities      |It contains all activities with only UI code
+|fragments       |It contains all fragments with only UI code
+|database        |It contains ROOM database to have some data locally.            
 |Listeners       |It contains all Interfaces which will work as listeners
 |models          |It contains classes to get interaction with Database/API
 |repositories    |It contains Java classes with actual business logic functions
-|retrofit        |It contains further two directories Clients and Objs
-|Clients         |It contains actual request making Interfaces
-|Objs             |It has retrofit objects to retrieve and parse Json responses from Retrofit requests.
 |utils           |It contains helping classes
 |viewmodels      |It contains View Models for all the activities. Its functions are get called by UI and it further calls relavent repository class' function.
+|worker          |It contains WorkManagers to work in background.
 
 ## Note
 

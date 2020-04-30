@@ -3,6 +3,7 @@ package pk.patta.app.worker;
 import android.content.Context;
 
 import androidx.annotation.NonNull;
+import androidx.work.Operation;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
@@ -25,17 +26,18 @@ public class SaveDataToFirestore extends Worker {
     public Result doWork() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         String collectionPath = "users/"+ FirebaseAuth.getInstance().getUid();
-        String name = getInputData().getString("name");
+        /*String name = getInputData().getString("name");
         String address = getInputData().getString("address");
         String province = getInputData().getString("province");
         String division = getInputData().getString("division");
         String district = getInputData().getString("district");
-        String union_council = getInputData().getString("union_council");
-        /*db.collection(collectionPath).add().addOnSuccessListener(documentReference -> {
+        String union_council = getInputData().getString("union_council");*/
+        Map<String, Object> map = getInputData().getKeyValueMap();
+        db.collection(collectionPath).add(map).addOnSuccessListener(documentReference -> {
 
         }).addOnFailureListener(e -> {
 
-        });*/
-        return null;
+        });
+        return Result.success();
     }
 }

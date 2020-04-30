@@ -16,12 +16,16 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 
 import com.facebook.stetho.Stetho;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.tiper.MaterialSpinner;
 //import com.jaredrummler.materialspinner.MaterialSpinner;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -207,18 +211,28 @@ public class SignupActivity extends AppCompatActivity implements SignupListener,
     public void onSignupSuccess() {
         binding.progressBar.setVisibility(View.INVISIBLE);
         binding.signupButton.setEnabled(true);
-        Data data = new Data.Builder()
-                .putString("name", binding.name.getText().toString().trim())
-                .putString("address", binding.address.getText().toString().trim())
-                .putString("province", binding.province.getSelectedItem().toString())
-                .putString("division", binding.division.getSelectedItem().toString())
-                .putString("district", binding.district.getSelectedItem().toString())
-                .putString("union_council", binding.unionCouncil.getText().toString().trim())
+        Map<String, Object> map = new HashMap<>();
+        map.put("name", binding.name.getText().toString().trim());
+        map.put("address", binding.address.getText().toString().trim());
+        map.put("province", binding.province.getSelectedItem().toString());
+        map.put("division", binding.division.getSelectedItem().toString());
+        map.put("district", binding.district.getSelectedItem().toString());
+        map.put("union_council", binding.unionCouncil.getText().toString().trim());
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+//        String collectionPath = "users/"+ FirebaseAuth.getInstance().getUid();
+        db.collection("users").document(FirebaseAuth.getInstance().getUid()).set(map)
+                .addOnSuccessListener(aVoid -> {
+                    Snackbar.make(findViewById(android.R.id.content), "Success", Snackbar.LENGTH_LONG).show();
+                }).addOnFailureListener(e -> {
+            Snackbar.make(findViewById(android.R.id.content), e.getMessage(), Snackbar.LENGTH_LONG).show();
+                });
+        /*Data data = new Data.Builder()
+                .putAll(map)
                 .build();
         OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(SaveDataToFirestore.class)
                 .setInputData(data)
                 .build();
-        WorkManager.getInstance(getApplicationContext()).enqueue(request);
+        WorkManager.getInstance(getApplicationContext()).enqueue(request);*/
         startActivity(new Intent(SignupActivity.this, DashboardActivity.class));
     }
 
