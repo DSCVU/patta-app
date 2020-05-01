@@ -35,7 +35,7 @@ public class QRGeneratorViewModel extends ViewModel {
         houseCode = new MutableLiveData<>();
         houseCode.setValue("00000-00000");
         locationUrl = new MutableLiveData<>();
-        locationUrl.setValue("__qrcodehttps://maps.google.com/local?q=31.4832209,74.0541978");
+        locationUrl.setValue("");
     }
 
     public void generateQR(String qrCodeStr){
@@ -74,7 +74,7 @@ public class QRGeneratorViewModel extends ViewModel {
                 if (task.isSuccessful()){
                     DocumentSnapshot documentSnapshot = task.getResult();
                     if (documentSnapshot!=null && documentSnapshot.get("location_url")!=null){
-                        houseCode.setValue(documentSnapshot.get("location_url").toString());
+                        locationUrl.setValue(documentSnapshot.get("location_url").toString());
                     }
                 }
             }).addOnFailureListener(e -> {

@@ -87,8 +87,9 @@
                     android:hint="@string/address"
                     android:inputType="textPostalAddress" />
 
-                <com.google.android.gms.maps.MapView
-                    android:id="@+id/map"
+                <fragment
+                    android:name="com.google.android.gms.maps.SupportMapFragment"
+                    android:id="@+id/mapSignup"
                     android:layout_width="match_parent"
                     android:layout_height="250dp" />
 

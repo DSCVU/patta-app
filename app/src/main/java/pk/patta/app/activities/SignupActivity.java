@@ -1,38 +1,46 @@
 package pk.patta.app.activities;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.databinding.DataBindingUtil;
-import androidx.databinding.adapters.SearchViewBindingAdapter;
-import androidx.databinding.adapters.TextViewBindingAdapter;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.work.Data;
-import androidx.work.OneTimeWorkRequest;
-import androidx.work.WorkManager;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Criteria;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
 import com.facebook.stetho.Stetho;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.tiper.MaterialSpinner;
 //import com.jaredrummler.materialspinner.MaterialSpinner;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 
@@ -43,9 +51,8 @@ import pk.patta.app.models.District;
 import pk.patta.app.models.Division;
 import pk.patta.app.models.Province;
 import pk.patta.app.viewmodels.SignupViewModel;
-import pk.patta.app.worker.SaveDataToFirestore;
 
-public class SignupActivity extends AppCompatActivity implements SignupListener, LifecycleOwner, OnMapReadyCallback {
+public class SignupActivity extends FragmentActivity implements SignupListener, LifecycleOwner, OnMapReadyCallback, LocationListener {
 
     private ActivitySignupBinding binding;
     private SignupViewModel viewModel;
@@ -56,6 +63,8 @@ public class SignupActivity extends AppCompatActivity implements SignupListener,
     private Division selectedDivision;
     private District selectedDistrict;
     private String tenDigitCode;
+    private Location currentLocation;
+    private LocationManager locationManager;
 
 
     @Override
@@ -79,8 +88,17 @@ public class SignupActivity extends AppCompatActivity implements SignupListener,
                         binding.password.getText().toString().trim());
             }
         });
-        binding.map.getMapAsync(this);
+// Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.mapSignup);
+        assert mapFragment != null;
+        mapFragment.getMapAsync(this);
+    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        getLocation();
     }
 
     private void populateProvinceSpinner() {
@@ -256,6 +274,52 @@ public class SignupActivity extends AppCompatActivity implements SignupListener,
         return valid;
     }
 
+    private void getLocation(){
+        Criteria criteria = new Criteria();
+        criteria.setAccuracy(Criteria.ACCURACY_LOW);
+        criteria.setPowerRequirement(Criteria.POWER_LOW);
+        criteria.setAltitudeRequired(false);
+        criteria.setBearingRequired(false);
+
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        String provider = locationManager.getBestProvider(criteria, true);
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        currentLocation = locationManager.getLastKnownLocation(provider);
+        if (currentLocation != null) {
+            showCurrentAddress();
+            // Retry
+        } else {
+            locationManager.requestLocationUpdates(provider, 1000, 0, this);
+        }
+    }
+
+    private void showCurrentAddress() {
+        try {
+            Geocoder geocoder = new Geocoder(SignupActivity.this, Locale.getDefault());
+            List<Address> addresses = null;
+
+            addresses = geocoder.getFromLocation(currentLocation.getLatitude(), currentLocation.getLongitude(), 1);
+            if (geocoder.isPresent()) {
+                Address returnAddress = addresses.get(0);
+                String address = returnAddress.getAddressLine(0);
+                String city = returnAddress.getLocality();
+                String country = returnAddress.getCountryName();
+                String zipCode = returnAddress.getPostalCode();
+
+                // Show Address
+                binding.address.setText(address + " " + city + " " + country + " " + zipCode);
+
+            } else {
+                Toast.makeText(getApplicationContext(), "Geocoder not present!", Toast.LENGTH_SHORT).show();
+            }
+
+        } catch (IOException e) {
+            Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
     @Override
     public void onSignupStart() {
         binding.progressBar.setVisibility(View.VISIBLE);
@@ -274,6 +338,9 @@ public class SignupActivity extends AppCompatActivity implements SignupListener,
         map.put("district", binding.district.getSelectedItem().toString());
         map.put("union_council", binding.unionCouncil.getText().toString().trim());
         map.put("house_code", tenDigitCode);
+        String url = "__qrcodehttps://maps.google.com/local?q="+currentLocation.getLatitude()+
+                ","+currentLocation.getLongitude();
+        map.put("location_url", url);
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 //        String collectionPath = "users/"+ FirebaseAuth.getInstance().getUid();
         db.collection("users").document(FirebaseAuth.getInstance().getUid()).set(map)
@@ -301,6 +368,38 @@ public class SignupActivity extends AppCompatActivity implements SignupListener,
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+
+        LatLng reqLocation = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+        googleMap.addMarker(new MarkerOptions().position(reqLocation).title("Me"));
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(reqLocation, 18.0f));
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        //remove location callback:
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        locationManager.removeUpdates(this);
+        currentLocation = location;
+
+        if (currentLocation != null) {
+            showCurrentAddress();
+        }
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
 
     }
 }
