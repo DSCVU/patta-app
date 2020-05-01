@@ -82,7 +82,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         LatLng reqLocation = new LatLng(latitude, longitude);
         mMap.addMarker(new MarkerOptions().position(reqLocation).title("Marker in Required Location"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(reqLocation));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(reqLocation, 12.0f));
         /*viewModel.getLocation().observe(this, location -> {
             // Add a marker in Required Location and move the camera
             LatLng reqLocation = new LatLng(location.getLatitude(), location.getLongitude());

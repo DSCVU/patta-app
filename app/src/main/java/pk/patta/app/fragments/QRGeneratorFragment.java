@@ -13,6 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -25,7 +26,7 @@ import pk.patta.app.listeners.QRGeneratorListener;
 import pk.patta.app.utils.InternetCheck;
 import pk.patta.app.viewmodels.QRGeneratorViewModel;
 
-public class QRGeneratorFragment extends Fragment implements QRGeneratorListener {
+public class QRGeneratorFragment extends Fragment implements QRGeneratorListener, LifecycleOwner {
 
     private QRGeneratorViewModel viewModel;
     private FragmentQrgeneratorBinding binding;
@@ -43,19 +44,27 @@ public class QRGeneratorFragment extends Fragment implements QRGeneratorListener
         binding.setViewModel(viewModel);
         viewModel.QRGeneratorListener = this;
         viewModel.generateQR(locationUrl);
-        binding.shareButton.setOnClickListener(v -> {
-            Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
-            sharingIntent.setType("text/plain");
-            String shareBody = locationUrl;
-            sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Location");
-            sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
-            startActivity(Intent.createChooser(sharingIntent, "Share via"));
+        viewModel.getLocationUrl().observe(getViewLifecycleOwner(), s -> {
+            locationUrl = s;
+            binding.shareButton.setEnabled(true);
+            binding.viewButton.setEnabled(true);
+            binding.shareButton.setOnClickListener(v -> {
+                Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+                sharingIntent.setType("text/plain");
+                String shareBody = locationUrl;
+                sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Location");
+                sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+                startActivity(Intent.createChooser(sharingIntent, "Share via"));
+            });
+            binding.viewButton.setOnClickListener(v -> {
+                Intent intent = new Intent(getActivity(), MapsActivity.class);
+                intent.putExtra("metadataType", "qrcode");
+                intent.putExtra("codeString", locationUrl);
+                startActivity(intent);
+            });
         });
-        binding.viewButton.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), MapsActivity.class);
-            intent.putExtra("metadataType", "qrcode");
-            intent.putExtra("codeString", locationUrl);
-            startActivity(intent);
+        viewModel.getHouseCode().observe(getViewLifecycleOwner(), s -> {
+            binding.materialTextView2.setText(s);
         });
 
 //        final TextView textView = root.findViewById(R.id.text_dashboard);

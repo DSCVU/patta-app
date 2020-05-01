@@ -87,6 +87,11 @@
                     android:hint="@string/address"
                     android:inputType="textPostalAddress" />
 
+                <com.google.android.gms.maps.MapView
+                    android:id="@+id/map"
+                    android:layout_width="match_parent"
+                    android:layout_height="250dp" />
+
                 <!--<com.jaredrummler.materialspinner.MaterialSpinner
                     android:id="@+id/province"
                     android:layout_width="match_parent"
@@ -151,7 +156,6 @@
                     android:ems="10"
                     android:enabled="false"
                     android:hint="@string/ten_digit_code_gen"
-                    android:maxLength="2"
                     android:maxLines="1"
                     android:inputType="text" />
 

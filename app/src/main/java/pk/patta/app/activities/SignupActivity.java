@@ -3,6 +3,8 @@ package pk.patta.app.activities;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
+import androidx.databinding.adapters.SearchViewBindingAdapter;
+import androidx.databinding.adapters.TextViewBindingAdapter;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -12,10 +14,14 @@ import androidx.work.WorkManager;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.ArrayAdapter;
 
 import com.facebook.stetho.Stetho;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
@@ -28,6 +34,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import pk.patta.app.R;
 import pk.patta.app.databinding.ActivitySignupBinding;
@@ -38,7 +45,7 @@ import pk.patta.app.models.Province;
 import pk.patta.app.viewmodels.SignupViewModel;
 import pk.patta.app.worker.SaveDataToFirestore;
 
-public class SignupActivity extends AppCompatActivity implements SignupListener, LifecycleOwner {
+public class SignupActivity extends AppCompatActivity implements SignupListener, LifecycleOwner, OnMapReadyCallback {
 
     private ActivitySignupBinding binding;
     private SignupViewModel viewModel;
@@ -60,7 +67,10 @@ public class SignupActivity extends AppCompatActivity implements SignupListener,
         binding.setViewModel(viewModel);
         binding.setLifecycleOwner(this);
         viewModel.listener = this;
-        tenDigitCode = "00000-00000";
+        Random random = new Random();
+        int num = 9999+random.nextInt(100000-9999+1);
+        tenDigitCode = "00000-"+num;
+        binding.tenDigitCode.setText(tenDigitCode);
         populateProvinceSpinner();
         binding.signupButton.setOnClickListener(v -> {
             if (isValid()){
@@ -69,6 +79,7 @@ public class SignupActivity extends AppCompatActivity implements SignupListener,
                         binding.password.getText().toString().trim());
             }
         });
+        binding.map.getMapAsync(this);
 
     }
 
@@ -94,7 +105,11 @@ public class SignupActivity extends AppCompatActivity implements SignupListener,
             @Override
             public void onItemSelected(@NonNull MaterialSpinner materialSpinner, @NonNull View view, int i, long l) {
                 selectedProvince = provinces.get(i);
-                tenDigitCode = selectedProvince.getId()+"0000-00000";
+//                tenDigitCode = selectedProvince.getId()+"0000-00000";
+                StringBuilder myName = new StringBuilder(tenDigitCode);
+                int id = selectedProvince.getId();
+                myName.setCharAt(0, (char) (id+'0'));
+                tenDigitCode = myName.toString();
                 binding.tenDigitCode.setText(tenDigitCode);
                 viewModel.getDivision(selectedProvince.getId()).observe(SignupActivity.this, divisions -> {
                     divisionValues.clear();
@@ -119,7 +134,12 @@ public class SignupActivity extends AppCompatActivity implements SignupListener,
             @Override
             public void onItemSelected(@NonNull MaterialSpinner materialSpinner, @NonNull View view, int i, long l) {
                 selectedDivision = divisions.get(i);
-                tenDigitCode = selectedProvince.getId()+selectedDivision.getDivisionId()+"000-00000";
+//                tenDigitCode = String.valueOf(selectedProvince.getId())+String.valueOf(selectedDivision.getDivisionId())+"000-00000";
+
+                StringBuilder myName = new StringBuilder(tenDigitCode);
+                int id = selectedDivision.getDivisionId();
+                myName.setCharAt(1, (char) (id+'0'));
+                tenDigitCode = myName.toString();
                 binding.tenDigitCode.setText(tenDigitCode);
                 viewModel.getDistrict(selectedProvince.getId(), selectedDivision.getDivisionId())
                         .observe(SignupActivity.this, districts -> {
@@ -144,6 +164,13 @@ public class SignupActivity extends AppCompatActivity implements SignupListener,
             @Override
             public void onItemSelected(@NonNull MaterialSpinner materialSpinner, @NonNull View view, int i, long l) {
                 selectedDistrict = districts.get(i);
+//                tenDigitCode = String.valueOf(selectedProvince.getId())+String.valueOf(selectedDivision.getDivisionId())+
+//                        String.valueOf(selectedDistrict.getDistrictId())+"00-00000";
+                StringBuilder myName = new StringBuilder(tenDigitCode);
+                int id = selectedDistrict.getDistrictId();
+                myName.setCharAt(2, (char) (id+'0'));
+                tenDigitCode = myName.toString();
+                binding.tenDigitCode.setText(tenDigitCode);
             }
 
             @Override
@@ -152,6 +179,34 @@ public class SignupActivity extends AppCompatActivity implements SignupListener,
             }
         });
 
+        binding.unionCouncil.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                StringBuilder myName = new StringBuilder(tenDigitCode);
+                if (s.length()==1){
+                    myName.setCharAt(3, s.charAt(0));
+                    myName.setCharAt(4, '0');
+                } else if (s.length()>1){
+                    myName.setCharAt(3, s.charAt(0));
+                    myName.setCharAt(4, s.charAt(1));
+                } else {
+                    myName.setCharAt(3, '0');
+                    myName.setCharAt(4, '0');
+                }
+                tenDigitCode = myName.toString();
+                binding.tenDigitCode.setText(tenDigitCode);
+            }
+        });
     }
 
     private boolean isValid(){
@@ -218,6 +273,7 @@ public class SignupActivity extends AppCompatActivity implements SignupListener,
         map.put("division", binding.division.getSelectedItem().toString());
         map.put("district", binding.district.getSelectedItem().toString());
         map.put("union_council", binding.unionCouncil.getText().toString().trim());
+        map.put("house_code", tenDigitCode);
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 //        String collectionPath = "users/"+ FirebaseAuth.getInstance().getUid();
         db.collection("users").document(FirebaseAuth.getInstance().getUid()).set(map)
@@ -241,5 +297,10 @@ public class SignupActivity extends AppCompatActivity implements SignupListener,
         binding.progressBar.setVisibility(View.INVISIBLE);
         binding.signupButton.setEnabled(true);
         Snackbar.make(findViewById(android.R.id.content), error, Snackbar.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+
     }
 }

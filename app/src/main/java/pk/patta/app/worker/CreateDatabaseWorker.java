@@ -85,39 +85,39 @@ public class CreateDatabaseWorker extends Worker {
 
         List<District> districts = new ArrayList<>();
         districts.add(new District(1, "BANNU", 0, 1));
-        districts.add(new District(1, "LAKKI MARWAT", 0, 1));
+        districts.add(new District(2, "LAKKI MARWAT", 0, 1));
 
         districts.add(new District(1, "DERA ISMAIL KHAN", 1, 1));
-        districts.add(new District(1, "TANK", 1, 1));
+        districts.add(new District(2, "TANK", 1, 1));
 
         districts.add(new District(1, "ABOTTABAD", 2, 1));
-        districts.add(new District(1, "BATTAGRAM", 2, 1));
-        districts.add(new District(1, "HARIPUR", 2, 1));
-        districts.add(new District(1, "LOWER KOHISTAN", 2, 1));
-        districts.add(new District(1, "MANSEHRA", 2, 1));
-        districts.add(new District(1, "TORGHAR", 2, 1));
-        districts.add(new District(1, "UPPER KOHISTAN", 2, 1));
-        districts.add(new District(1, "KOLAI PALAS", 2, 1));
+        districts.add(new District(2, "BATTAGRAM", 2, 1));
+        districts.add(new District(3, "HARIPUR", 2, 1));
+        districts.add(new District(4, "LOWER KOHISTAN", 2, 1));
+        districts.add(new District(5, "MANSEHRA", 2, 1));
+        districts.add(new District(6, "TORGHAR", 2, 1));
+        districts.add(new District(7, "UPPER KOHISTAN", 2, 1));
+        districts.add(new District(8, "KOLAI PALAS", 2, 1));
 
         districts.add(new District(1, "HANGU", 3, 1));
-        districts.add(new District(1, "KARAK", 3, 1));
-        districts.add(new District(1, "KOHAT", 3, 1));
+        districts.add(new District(2, "KARAK", 3, 1));
+        districts.add(new District(3, "KOHAT", 3, 1));
 
         districts.add(new District(1, "BUNER", 4, 1));
-        districts.add(new District(1, "LOWER CHITRAL", 4, 1));
-        districts.add(new District(1, "UPPER CHITRAL", 4, 1));
-        districts.add(new District(1, "MALAKAND", 4, 1));
-        districts.add(new District(1, "LOWER DIR", 4, 1));
-        districts.add(new District(1, "SHANGLA", 4, 1));
-        districts.add(new District(1, "SAWAT", 4, 1));
-        districts.add(new District(1, "UPPER DIR", 4, 1));
+        districts.add(new District(2, "LOWER CHITRAL", 4, 1));
+        districts.add(new District(3, "UPPER CHITRAL", 4, 1));
+        districts.add(new District(4, "MALAKAND", 4, 1));
+        districts.add(new District(5, "LOWER DIR", 4, 1));
+        districts.add(new District(6, "SHANGLA", 4, 1));
+        districts.add(new District(7, "SAWAT", 4, 1));
+        districts.add(new District(8, "UPPER DIR", 4, 1));
 
         districts.add(new District(1, "MARDAN", 5, 1));
-        districts.add(new District(1, "SWABI", 5, 1));
+        districts.add(new District(2, "SWABI", 5, 1));
 
         districts.add(new District(1, "CHARSADDA", 6, 1));
-        districts.add(new District(1, "NOSHEHRA", 6, 1));
-        districts.add(new District(1, "PESHAWAR", 6, 1));
+        districts.add(new District(2, "NOSHEHRA", 6, 1));
+        districts.add(new District(3, "PESHAWAR", 6, 1));
 
         database.districtDAO().insert(districts);
 

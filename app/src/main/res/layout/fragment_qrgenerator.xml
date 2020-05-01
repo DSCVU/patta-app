@@ -56,6 +56,7 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="24dp"
             android:text="Share"
+            android:enabled="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/materialTextView2" />
@@ -68,6 +69,7 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="8dp"
             android:text="View"
+            android:enabled="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.501"
             app:layout_constraintStart_toStartOf="parent"
