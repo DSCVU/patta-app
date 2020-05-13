@@ -16,11 +16,12 @@
 
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:paddingBottom="70dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="vertical" >
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -110,6 +111,7 @@
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="8dp"
+                    android:hint="@string/province"
                     android:ems="10"
                     android:backgroundTint="@color/colorAccent" />
 
@@ -120,6 +122,7 @@
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="8dp"
+                    android:hint="@string/division"
                     android:ems="10"
                     android:backgroundTint="@color/colorAccent" />
 
@@ -131,6 +134,7 @@
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="8dp"
+                    android:hint="@string/district"
                     android:ems="10"
                     android:backgroundTint="@color/colorAccent" />
 

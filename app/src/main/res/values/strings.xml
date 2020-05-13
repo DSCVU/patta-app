@@ -22,4 +22,7 @@
     <string name="signout">Signout</string>
     <string name="forgot_password_click_here">Forgot Password? Click Here</string>
     <string name="recover_password">Recover Password</string>
+    <string name="province">Province</string>
+    <string name="division">Division</string>
+    <string name="district">District</string>
 </resources>

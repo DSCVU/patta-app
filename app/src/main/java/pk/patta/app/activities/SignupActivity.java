@@ -19,6 +19,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
@@ -65,6 +66,7 @@ public class SignupActivity extends FragmentActivity implements SignupListener, 
     private String tenDigitCode;
     private Location currentLocation;
     private LocationManager locationManager;
+    private GoogleMap mMap;
 
 
     @Override
@@ -86,6 +88,10 @@ public class SignupActivity extends FragmentActivity implements SignupListener, 
                 viewModel.signup(
                         binding.email.getText().toString().trim(),
                         binding.password.getText().toString().trim());
+            } else {
+                Snackbar.make(findViewById(android.R.id.content),
+                        "Some fields might contain invalid values",
+                        Snackbar.LENGTH_LONG).show();
             }
         });
 // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -98,7 +104,6 @@ public class SignupActivity extends FragmentActivity implements SignupListener, 
     @Override
     protected void onStart() {
         super.onStart();
-        getLocation();
     }
 
     private void populateProvinceSpinner() {
@@ -235,6 +240,7 @@ public class SignupActivity extends FragmentActivity implements SignupListener, 
         String password = binding.password.getText().toString().trim();
         String confirmPassword = binding.confirmPassword.getText().toString().trim();
         String address = binding.address.getText().toString().trim();
+        String unionCouncil = binding.unionCouncil.getText().toString().trim();
 
         if (name.isEmpty() || name.length()<6){
             binding.name.setError("Please enter a valid name");
@@ -265,33 +271,60 @@ public class SignupActivity extends FragmentActivity implements SignupListener, 
                 binding.confirmPassword.setError("Password didn't match");
             }
         }
-        if (address.isEmpty() || address.length()<6){
+        if (address.isEmpty() || address.length()<3){
             binding.address.setError("Please enter a valid Address");
             valid = false;
         } else {
             binding.address.setError(null);
         }
+        if (unionCouncil.isEmpty() || unionCouncil.length()<2){
+            binding.unionCouncil.setError("Please enter a valid Union Council number");
+            valid = false;
+        } else {
+            binding.unionCouncil.setError(null);
+        }
         return valid;
     }
 
     private void getLocation(){
-        Criteria criteria = new Criteria();
-        criteria.setAccuracy(Criteria.ACCURACY_LOW);
-        criteria.setPowerRequirement(Criteria.POWER_LOW);
+        /*Criteria criteria = new Criteria();
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+        criteria.setPowerRequirement(Criteria.POWER_HIGH);
         criteria.setAltitudeRequired(false);
         criteria.setBearingRequired(false);
-
+*/
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        String provider = locationManager.getBestProvider(criteria, true);
+//        String provider = locationManager.getBestProvider(criteria, true);
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        currentLocation = locationManager.getLastKnownLocation(provider);
-        if (currentLocation != null) {
-            showCurrentAddress();
-            // Retry
-        } else {
-            locationManager.requestLocationUpdates(provider, 1000, 0, this);
+        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 0, this);
+            /*currentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if (currentLocation != null) {
+                showCurrentAddress();
+                // Retry
+            } else {
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 0, this);
+            }*/
+        } else if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)){
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 2000, 0, this);
+            /*currentLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            if (currentLocation != null) {
+                showCurrentAddress();
+                // Retry
+            } else {
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 2000, 0, this);
+            }*/
+        } else if (locationManager.isProviderEnabled(LocationManager.PASSIVE_PROVIDER)){
+            locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 2000, 0, this);
+            /*currentLocation = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
+            if (currentLocation != null) {
+                showCurrentAddress();
+                // Retry
+            } else {
+                locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 2000, 0, this);
+            }*/
         }
     }
 
@@ -309,7 +342,8 @@ public class SignupActivity extends FragmentActivity implements SignupListener, 
                 String zipCode = returnAddress.getPostalCode();
 
                 // Show Address
-                binding.address.setText(address + " " + city + " " + country + " " + zipCode);
+//                binding.address.setText(address + " " + city + " " + country + " " + zipCode);
+                binding.address.setText(address);
 
             } else {
                 Toast.makeText(getApplicationContext(), "Geocoder not present!", Toast.LENGTH_SHORT).show();
@@ -333,9 +367,18 @@ public class SignupActivity extends FragmentActivity implements SignupListener, 
         Map<String, Object> map = new HashMap<>();
         map.put("name", binding.name.getText().toString().trim());
         map.put("address", binding.address.getText().toString().trim());
-        map.put("province", binding.province.getSelectedItem().toString());
-        map.put("division", binding.division.getSelectedItem().toString());
-        map.put("district", binding.district.getSelectedItem().toString());
+        if (binding.province.getSelectedItem()!=null || binding.province.getSelectedItem()
+                .toString().equals("")){
+            map.put("province", binding.province.getSelectedItem().toString());
+        }
+        if (binding.division.getSelectedItem() != null || binding.division.getSelectedItem()
+                .toString().equals("")){
+            map.put("division", binding.division.getSelectedItem().toString());
+        }
+        if (binding.district.getSelectedItem()!=null || binding.district.getSelectedItem()
+                .toString().equals("")){
+            map.put("district", binding.district.getSelectedItem().toString());
+        }
         map.put("union_council", binding.unionCouncil.getText().toString().trim());
         map.put("house_code", tenDigitCode);
         String url = "__qrcodehttps://maps.google.com/local?q="+currentLocation.getLatitude()+
@@ -368,23 +411,31 @@ public class SignupActivity extends FragmentActivity implements SignupListener, 
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-
-        LatLng reqLocation = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-        googleMap.addMarker(new MarkerOptions().position(reqLocation).title("Me"));
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(reqLocation, 18.0f));
+        mMap = googleMap;
+        getLocation();
+        if (currentLocation!=null){
+            mMap.clear();
+            LatLng reqLocation = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+            mMap.addMarker(new MarkerOptions().position(reqLocation).title("Me"));
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(reqLocation, 18.0f));
+        }
     }
 
     @Override
     public void onLocationChanged(Location location) {
         //remove location callback:
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        /*if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
-        }
-        locationManager.removeUpdates(this);
+        }*/
         currentLocation = location;
 
         if (currentLocation != null) {
             showCurrentAddress();
+            mMap.clear();
+            LatLng reqLocation = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+            mMap.addMarker(new MarkerOptions().position(reqLocation).title("Me"));
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(reqLocation, 18.0f));
+            locationManager.removeUpdates(this);
         }
     }
 

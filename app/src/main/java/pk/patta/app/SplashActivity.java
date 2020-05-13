@@ -51,8 +51,9 @@ public class SplashActivity extends AppCompatActivity implements LifecycleOwner 
     private void checkPermission(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
             if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) ==
+                    PackageManager.PERMISSION_DENIED || checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) ==
                     PackageManager.PERMISSION_DENIED){
-                String[] permission = {Manifest.permission.ACCESS_FINE_LOCATION};
+                String[] permission = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
                 requestPermissions(permission, PERMISSION_CODE);
             } else {
                 moveNext();
@@ -66,7 +67,8 @@ public class SplashActivity extends AppCompatActivity implements LifecycleOwner 
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         if (requestCode == PERMISSION_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED
+            && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
                 moveNext();
             } else {
                 Snackbar.make(findViewById(android.R.id.content),
