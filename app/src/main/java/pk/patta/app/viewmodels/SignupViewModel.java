@@ -1,6 +1,7 @@
 package pk.patta.app.viewmodels;
 
 import android.app.Application;
+import android.location.Location;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -44,5 +45,9 @@ public class SignupViewModel extends AndroidViewModel {
         } else {
             listener.onSignupFailure("Connection Error! No Internet Connection");
         }
+    }
+
+    public LiveData<Location> getLocation(){
+        return repository.getLocation();
     }
 }

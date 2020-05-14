@@ -5,6 +5,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Context;
@@ -30,6 +31,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
@@ -53,7 +55,7 @@ import pk.patta.app.models.Division;
 import pk.patta.app.models.Province;
 import pk.patta.app.viewmodels.SignupViewModel;
 
-public class SignupActivity extends FragmentActivity implements SignupListener, LifecycleOwner, OnMapReadyCallback, LocationListener {
+public class SignupActivity extends FragmentActivity implements SignupListener, LifecycleOwner, OnMapReadyCallback {
 
     private ActivitySignupBinding binding;
     private SignupViewModel viewModel;
@@ -65,7 +67,6 @@ public class SignupActivity extends FragmentActivity implements SignupListener, 
     private District selectedDistrict;
     private String tenDigitCode;
     private Location currentLocation;
-    private LocationManager locationManager;
     private GoogleMap mMap;
 
 
@@ -286,47 +287,6 @@ public class SignupActivity extends FragmentActivity implements SignupListener, 
         return valid;
     }
 
-    private void getLocation(){
-        /*Criteria criteria = new Criteria();
-        criteria.setAccuracy(Criteria.ACCURACY_FINE);
-        criteria.setPowerRequirement(Criteria.POWER_HIGH);
-        criteria.setAltitudeRequired(false);
-        criteria.setBearingRequired(false);
-*/
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-//        String provider = locationManager.getBestProvider(criteria, true);
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 0, this);
-            /*currentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            if (currentLocation != null) {
-                showCurrentAddress();
-                // Retry
-            } else {
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 0, this);
-            }*/
-        } else if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)){
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 2000, 0, this);
-            /*currentLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-            if (currentLocation != null) {
-                showCurrentAddress();
-                // Retry
-            } else {
-                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 2000, 0, this);
-            }*/
-        } else if (locationManager.isProviderEnabled(LocationManager.PASSIVE_PROVIDER)){
-            locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 2000, 0, this);
-            /*currentLocation = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
-            if (currentLocation != null) {
-                showCurrentAddress();
-                // Retry
-            } else {
-                locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 2000, 0, this);
-            }*/
-        }
-    }
 
     private void showCurrentAddress() {
         try {
@@ -392,13 +352,6 @@ public class SignupActivity extends FragmentActivity implements SignupListener, 
                 }).addOnFailureListener(e -> {
             Snackbar.make(findViewById(android.R.id.content), e.getMessage(), Snackbar.LENGTH_LONG).show();
                 });
-        /*Data data = new Data.Builder()
-                .putAll(map)
-                .build();
-        OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(SaveDataToFirestore.class)
-                .setInputData(data)
-                .build();
-        WorkManager.getInstance(getApplicationContext()).enqueue(request);*/
         startActivity(new Intent(SignupActivity.this, DashboardActivity.class));
     }
 
@@ -412,45 +365,12 @@ public class SignupActivity extends FragmentActivity implements SignupListener, 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        getLocation();
-        if (currentLocation!=null){
+        mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+        viewModel.getLocation().observe(this, location -> {
             mMap.clear();
-            LatLng reqLocation = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-            mMap.addMarker(new MarkerOptions().position(reqLocation).title("Me"));
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(reqLocation, 18.0f));
-        }
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        //remove location callback:
-        /*if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }*/
-        currentLocation = location;
-
-        if (currentLocation != null) {
-            showCurrentAddress();
-            mMap.clear();
-            LatLng reqLocation = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-            mMap.addMarker(new MarkerOptions().position(reqLocation).title("Me"));
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(reqLocation, 18.0f));
-            locationManager.removeUpdates(this);
-        }
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-
+            LatLng sydney = new LatLng(location.getLatitude(), location.getLongitude());
+            mMap.addMarker(new MarkerOptions().position(sydney).title("My Location"));
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(sydney, 18.0f));
+        });
     }
 }
