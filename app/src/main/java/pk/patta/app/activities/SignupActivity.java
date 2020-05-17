@@ -80,12 +80,12 @@ public class SignupActivity extends FragmentActivity implements SignupListener, 
         binding.setLifecycleOwner(this);
         viewModel.listener = this;
         Random random = new Random();
-        int num = 9999+random.nextInt(100000-9999+1);
-        tenDigitCode = "00000-"+num;
+        int num = 9999 + random.nextInt(100000 - 9999 + 1);
+        tenDigitCode = "00000-" + num;
         binding.tenDigitCode.setText(tenDigitCode);
         populateProvinceSpinner();
         binding.signupButton.setOnClickListener(v -> {
-            if (isValid()){
+            if (isValid()) {
                 viewModel.signup(
                         binding.email.getText().toString().trim(),
                         binding.password.getText().toString().trim());
@@ -100,6 +100,7 @@ public class SignupActivity extends FragmentActivity implements SignupListener, 
                 .findFragmentById(R.id.mapSignup);
         assert mapFragment != null;
         mapFragment.getMapAsync(this);
+
     }
 
     @Override
@@ -115,7 +116,7 @@ public class SignupActivity extends FragmentActivity implements SignupListener, 
         viewModel.getProvince().observe(this, provinces -> {
             provinceValues.clear();
             this.provinces = provinces;
-            for (Province province: provinces) {
+            for (Province province : provinces) {
                 provinceValues.add(province.getProvince());
             }
 //            binding.province.setItems(provinceValues);
@@ -132,13 +133,13 @@ public class SignupActivity extends FragmentActivity implements SignupListener, 
 //                tenDigitCode = selectedProvince.getId()+"0000-00000";
                 StringBuilder myName = new StringBuilder(tenDigitCode);
                 int id = selectedProvince.getId();
-                myName.setCharAt(0, (char) (id+'0'));
+                myName.setCharAt(0, (char) (id + '0'));
                 tenDigitCode = myName.toString();
                 binding.tenDigitCode.setText(tenDigitCode);
                 viewModel.getDivision(selectedProvince.getId()).observe(SignupActivity.this, divisions -> {
                     divisionValues.clear();
                     SignupActivity.this.divisions = divisions;
-                    for (Division division: divisions) {
+                    for (Division division : divisions) {
                         divisionValues.add(division.getDivision());
                     }
                     ArrayAdapter<String> adapter = new ArrayAdapter<>(SignupActivity.this,
@@ -162,14 +163,14 @@ public class SignupActivity extends FragmentActivity implements SignupListener, 
 
                 StringBuilder myName = new StringBuilder(tenDigitCode);
                 int id = selectedDivision.getDivisionId();
-                myName.setCharAt(1, (char) (id+'0'));
+                myName.setCharAt(1, (char) (id + '0'));
                 tenDigitCode = myName.toString();
                 binding.tenDigitCode.setText(tenDigitCode);
                 viewModel.getDistrict(selectedProvince.getId(), selectedDivision.getDivisionId())
                         .observe(SignupActivity.this, districts -> {
                             districtValues.clear();
                             SignupActivity.this.districts = districts;
-                            for (District district: districts) {
+                            for (District district : districts) {
                                 districtValues.add(district.getDistrict());
                             }
                             ArrayAdapter<String> adapter = new ArrayAdapter<>(SignupActivity.this,
@@ -192,7 +193,7 @@ public class SignupActivity extends FragmentActivity implements SignupListener, 
 //                        String.valueOf(selectedDistrict.getDistrictId())+"00-00000";
                 StringBuilder myName = new StringBuilder(tenDigitCode);
                 int id = selectedDistrict.getDistrictId();
-                myName.setCharAt(2, (char) (id+'0'));
+                myName.setCharAt(2, (char) (id + '0'));
                 tenDigitCode = myName.toString();
                 binding.tenDigitCode.setText(tenDigitCode);
             }
@@ -217,10 +218,10 @@ public class SignupActivity extends FragmentActivity implements SignupListener, 
             @Override
             public void afterTextChanged(Editable s) {
                 StringBuilder myName = new StringBuilder(tenDigitCode);
-                if (s.length()==1){
+                if (s.length() == 1) {
                     myName.setCharAt(3, s.charAt(0));
                     myName.setCharAt(4, '0');
-                } else if (s.length()>1){
+                } else if (s.length() > 1) {
                     myName.setCharAt(3, s.charAt(0));
                     myName.setCharAt(4, s.charAt(1));
                 } else {
@@ -233,7 +234,7 @@ public class SignupActivity extends FragmentActivity implements SignupListener, 
         });
     }
 
-    private boolean isValid(){
+    private boolean isValid() {
         boolean valid = true;
 
         String name = binding.name.getText().toString().trim();
@@ -243,42 +244,42 @@ public class SignupActivity extends FragmentActivity implements SignupListener, 
         String address = binding.address.getText().toString().trim();
         String unionCouncil = binding.unionCouncil.getText().toString().trim();
 
-        if (name.isEmpty() || name.length()<6){
+        if (name.isEmpty() || name.length() < 6) {
             binding.name.setError("Please enter a valid name");
             valid = false;
         } else {
             binding.name.setError(null);
         }
-        if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()){
+        if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             binding.email.setError("Please enter a valid email address");
             valid = false;
         } else {
             binding.email.setError(null);
         }
-        if (password.isEmpty() || password.length()<6){
+        if (password.isEmpty() || password.length() < 6) {
             binding.password.setError("Please enter a valid password");
             valid = false;
         } else {
             binding.password.setError(null);
         }
-        if (confirmPassword.isEmpty() || confirmPassword.length()<6){
+        if (confirmPassword.isEmpty() || confirmPassword.length() < 6) {
             binding.confirmPassword.setError("Confirm Password is not valid");
             valid = false;
         } else {
             binding.confirmPassword.setError(null);
-            if (password.equals(confirmPassword)){
+            if (password.equals(confirmPassword)) {
                 binding.confirmPassword.setError(null);
             } else {
                 binding.confirmPassword.setError("Password didn't match");
             }
         }
-        if (address.isEmpty() || address.length()<3){
+        if (address.isEmpty() || address.length() < 3) {
             binding.address.setError("Please enter a valid Address");
             valid = false;
         } else {
             binding.address.setError(null);
         }
-        if (unionCouncil.isEmpty() || unionCouncil.length()<2){
+        if (unionCouncil.isEmpty() || unionCouncil.length() < 2) {
             binding.unionCouncil.setError("Please enter a valid Union Council number");
             valid = false;
         } else {
@@ -327,22 +328,22 @@ public class SignupActivity extends FragmentActivity implements SignupListener, 
         Map<String, Object> map = new HashMap<>();
         map.put("name", binding.name.getText().toString().trim());
         map.put("address", binding.address.getText().toString().trim());
-        if (binding.province.getSelectedItem()!=null || binding.province.getSelectedItem()
-                .toString().equals("")){
+        if (binding.province.getSelectedItem() != null || binding.province.getSelectedItem()
+                .toString().equals("")) {
             map.put("province", binding.province.getSelectedItem().toString());
         }
         if (binding.division.getSelectedItem() != null || binding.division.getSelectedItem()
-                .toString().equals("")){
+                .toString().equals("")) {
             map.put("division", binding.division.getSelectedItem().toString());
         }
-        if (binding.district.getSelectedItem()!=null || binding.district.getSelectedItem()
-                .toString().equals("")){
+        if (binding.district.getSelectedItem() != null || binding.district.getSelectedItem()
+                .toString().equals("")) {
             map.put("district", binding.district.getSelectedItem().toString());
         }
         map.put("union_council", binding.unionCouncil.getText().toString().trim());
         map.put("house_code", tenDigitCode);
-        String url = "__qrcodehttps://maps.google.com/local?q="+currentLocation.getLatitude()+
-                ","+currentLocation.getLongitude();
+        String url = "__qrcodehttps://maps.google.com/local?q=" + currentLocation.getLatitude() +
+                "," + currentLocation.getLongitude();
         map.put("location_url", url);
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 //        String collectionPath = "users/"+ FirebaseAuth.getInstance().getUid();
@@ -351,7 +352,7 @@ public class SignupActivity extends FragmentActivity implements SignupListener, 
                     Snackbar.make(findViewById(android.R.id.content), "Success", Snackbar.LENGTH_LONG).show();
                 }).addOnFailureListener(e -> {
             Snackbar.make(findViewById(android.R.id.content), e.getMessage(), Snackbar.LENGTH_LONG).show();
-                });
+        });
         startActivity(new Intent(SignupActivity.this, DashboardActivity.class));
     }
 
@@ -367,10 +368,24 @@ public class SignupActivity extends FragmentActivity implements SignupListener, 
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         viewModel.getLocation().observe(this, location -> {
-            mMap.clear();
-            LatLng sydney = new LatLng(location.getLatitude(), location.getLongitude());
-            mMap.addMarker(new MarkerOptions().position(sydney).title("My Location"));
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(sydney, 18.0f));
+            mMap.setMyLocationEnabled(true);
+            //getting  Current  Location
+            if (mMap != null) {
+                mMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
+                    @Override
+                    public void onMyLocationChange(Location arg0) {
+                        if (currentLocation == null) {
+                            mMap.clear();
+                            //Adding Marker on my position..
+                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(arg0.getLatitude(), arg0.getLongitude()), 18));
+                            mMap.addMarker(new MarkerOptions().position(new LatLng(arg0.getLatitude(), arg0.getLongitude())).title("It's Me!"));
+                            //add location
+                            currentLocation = arg0;
+                        }
+                    }
+                });
+            }
         });
     }
 }
+
