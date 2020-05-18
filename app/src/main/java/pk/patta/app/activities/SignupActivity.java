@@ -371,6 +371,8 @@ public class SignupActivity extends FragmentActivity implements SignupListener, 
             LatLng sydney = new LatLng(location.getLatitude(), location.getLongitude());
             mMap.addMarker(new MarkerOptions().position(sydney).title("My Location"));
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(sydney, 18.0f));
+            currentLocation = location;
+            showCurrentAddress();
         });
     }
 }
